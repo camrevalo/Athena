@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Athena | {% block title %}Athena{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="{% static 'forum/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'forum/bootstrap/css/bootstrap-responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'forum/style.css' %}" rel="stylesheet">
+
+  </head>
+
+  <body style = "background-color: #e5e5e5; padding: 7.5px;">
+
+    <!-- navbar -->
+    <div class="navbar navbar-static-top">
+      <div class="navbar-inner" style = "background-color: #ffffff; background-image: none">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <div class="nav-collapse collapse">
+            
+            <ul class="nav pull-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'users:profile' %}"> Profile</a></li>
+                    <li><a href="/groups/">Groups</a></li>
+                    {% if user.is_authenticated %}
+                      <li><a href="{% url 'users:edit_profile' %}">Edit Profile</a></li>
+                    {% endif %}
+                </ul>
+              </li>
+
+            </ul>
+
+            <ul class="nav">
+              <li><a href="/forum/"><span class=" icon-home" aria-hidden="true"></span> Home</a></li>
+              <li><a href=""> <span class=" icon-bell" aria-hidden="true"></span> Notifications</a></li>
+            </ul>   
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    {% block content %}
+    {% endblock %}
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src = "{% static 'forum/bootstrap/js/bootstrap.js' %}" ></script>
+    <script src = "{% static 'forum/my-java.js' %}" ></script>
+    <!-- jscript for affixing sidebar, voting, answering -->
+    <script type="text/javascript">
+      $('#sidebar').affix({
+        offset: {
+          top: 100,
+          bottom: function () {
+            return (this.bottom = $('.footer').outerHeight(true))
+          }
+        }
+      })
+      
+      $('.answer-form').on('submit', function(event){
+          event.preventDefault();
+          console.log("form submitted!");  // sanity check
+          var question_id = $(this).attr('value');
+          answer(question_id);
+      });
+
+      $('.up-vote').on('click', function(event){
+          event.preventDefault();
+          console.log("up-vote clicked");  // sanity check
+          var answer_id = $(this).attr('value');
+          console.log(answer_id);
+          upvote(answer_id, {{user.id}});
+      });
+
+      $('.down-vote').on('click', function(event){
+          event.preventDefault();
+          console.log("down-vote clicked");  // sanity check
+          var answer_id = $(this).attr('value');
+          console.log(answer_id);
+          downvote(answer_id, {{user.id}});
+      });
+
+    </script>
+  </body>
+</html>

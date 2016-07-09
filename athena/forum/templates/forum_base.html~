@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class = "container-fluid" style = "padding:10px">
+  <div class = "row-fluid">
+    
+    <!-- sidebar -->
+    <div class = "span4">
+      <div data-spy="affix">
+        <!-- profile box -->
+        <div class = "thumbnail" style = "margin-bottom:10px; background-color: white">
+          {% if user.is_authenticated %}
+            <div class = "row-fluid">
+              <div class = "span5">
+                <!-- ADD USER IMAGE -->
+                <div class = "square-crop"><a class = "hidden-link" href = "{% url 'users:profile' %}">
+                  <img src="https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-xfp1/t31.0-8/s960x960/10256612_10203806842594141_8536559186258868509_o.jpg">
+                </a></div>
+              </div>
+              <div class = "span7" style = "padding-right: 5px;">
+                <a class = "hidden-link" href = "{% url 'users:profile' %}">
+                  <h4>{{ user.username }}</h4>
+                </a>
+                <p> {{ user.userprofile.school }} </br> 
+		    {% if user.userprofile.isTeacher %}  
+			Teacher
+		    {% else %}
+			Student
+		    {% endif %}
+		</p>
+                <div class = "text-right" ><a href="{% url 'users:logout' %}">Logout</a></div>
+              </div>
+            </div>
+          {% else %}
+            <div class = "row-fluid">
+              <div class = "span5">
+                <img class = "square-crop" src = "{{STATIC_URL}}forum/flag.png">
+              </div>
+              <div class = "span7 text-center">
+                <h4>Who are you?</h4>
+                <a href="{% url 'users:register' %}">Sign up</a><br />
+                <a href="#myModalLogin" data-toggle="modal">Log in</a>
+              </div>
+            </div>
+            
+          {% endif %}
+        </div>
+
+        <!-- groups -->
+        <div class = "thumbnail" style = "margin-bottom:10px; background-color: white; padding: 0px;">
+          <a class = "hidden-link" href = "/groups/"><h4 style = "margin-top:0;" class = "thumbnail blue-head link text-center"> Your Groups </h4></a>
+          <div style = "padding: 10px;">
+            {% if user.is_authenticated %}
+           <!-- stuff about populating groups -->
+              {% if my_groups %}
+              <ul>
+                {% for group in my_groups %}
+                <li>
+                  <a href="{% url 'groups:detail' group.id %}">{{ group.group_name }}</a>
+                </li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              <p>no groups</p>
+              {% endif %}
+              <a class="btn" href = "/groups/new"><span class=" icon-plus" aria-hidden="true"></span> Create Group
+              </a>
+            {% else %}
+              <p class = "text-center"> Sign in to see your groups </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- end sidebar -->
+
+    <div class = "span8 thumbnail" style = "background-color: white; padding: 0px;">
+      {% block forum %}
+      {% endblock %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal HTML -->
+<div id="myModalLogin" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Login</h4>
+            </div>
+            <div class="modal-body">
+                <form id="login_form" method="post" action="/users/login/">
+                    {% csrf_token %}
+                    Username: <input type="text" name="username" value="" size="50" />
+                    <br />
+                    Password: <input type="password" name="password" value="" size="50" />
+                    <br /><br/>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value = "submit"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

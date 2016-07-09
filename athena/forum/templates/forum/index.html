@@ -1,0 +1,138 @@
+{% extends "forum_base.html" %}
+
+{% block forum %}
+
+<!-- question form! -->
+  <div class = "text-center thumbnail blue-head link question-button">
+    <h3 style = "margin-top: 15px; margin-bottom: 0px;">Ask a Question!
+    </h3>
+    
+      <form style = "margin-bottom: 0px; margin-top: 0px; text-align: left;" action="{% url 'forum:add_question' %}" method="POST">
+        <div class = "form-group" style = "padding: 15px;">
+          {% csrf_token %}
+          <input data-toggle="collapse" href="#question-form" aria-expanded="false" aria-controls="question-form" type='text' style = "min-width: 290px; width: 97%;" placeholder="Enter a one line summary of your question..." name='question'></input> <br/>
+          <div id = "question-form" class = "collapse">
+          <textarea rows="7" style = "width: 97%" placeholder="Your question in more detail here!" name="body"></textarea> <br/>
+          <select name="subject">
+            <option value="" disabled selected>Select a Subject!</option>
+          {% for subject in subject_choices %}
+    	       <option value={{ subject }}> {{ subject }}</option>
+          {% endfor %}
+          </select>
+          <br/>
+          <input class = "btn" type="submit" value="Ask!" style = "margin-top:10px;">
+          </div>
+        </div>
+      </form>
+  </div>
+
+
+  
+
+
+<div class = "thumbnail" style = "background-color: white; padding: 0px; margin-top: 10px;">
+  <div class = "text-center thumbnail blue-head link question-button">
+    
+    <!-- subject tags  -->
+  <div class = "text-center" style = "padding-bottom: 10px; padding-top: 10px"> 
+    <form style = "margin: 0px" action="{% url 'forum:filter_index' %}" method="POST">
+      {% csrf_token %}
+      <button style = "margin: 2.5px;" class = "btn {% if selected == "All" %}active{%endif%}" type="submit" name="subject" value="All"> All 
+      {% for subject in subject_choices %}
+        <button style = "margin-left: 2.5px; margin-right:2.5px;"  class = "btn {% if selected == subject %}active{%endif%}" type="submit" name="subject" value={{ subject }}>{{subject}}
+      {% endfor %}
+    </form>
+  </div>
+  </div>
+
+  <!-- list of questions -->
+  {% if latest_question_list %}
+    {% for question in latest_question_list %}
+      <div style = "border-bottom: solid #dddddd 1px; margin : 0px; padding-top: 5px;">
+      <div class = "question">
+        <div class = "row-fluid">
+          <div class = "span1">
+            <div class = "square-small"><a class = "hidden-link" href="{% url 'users:profile' question.user.id %}"><img src = "{{ question.user.userprofile.picture }}"></a></div>
+            <span class = "text-center tiny-text" style = "{% if question.user.userprofile.isTeacher %}color: #FF6600{% else %}color: #0077bb{% endif %}">{% if question.user.userprofile.isTeacher %}Teacher{% else %}{% endif %}</span>
+          </div>
+          <div class = "span11">
+            <div>
+            <span style = "font-size: 13px;"><a class = "hidden-link" href="{% url 'users:profile' question.user.id %}" style = "{% if question.user.userprofile.isTeacher %} color: #FF6600 {% endif %}"><i><b>{{ question.user }}</b></i></a> in {{ question.subject }}</span> &nbsp;&nbsp;<span class = "tiny-text gray-text">{% if question.answer_set.all|length == 1 %} 1 Answer {% elif question.answer_set.all|length == 0 %} Answers needed! {% else %} {{question.answer_set.all|length}} Answers {% endif %}</span>
+            <p class = "question-title linked" style = "margin: 5px" data-toggle="collapse" href="#{{question.id}}" aria-expanded="false" aria-controls="{{question.id}}">{{ question.question_text }}
+            </p>
+            </div>
+          </div>
+        </div>
+        <!-- answers collapse -->
+        <div class="collapse" id="{{question.id}}">
+          <div class = "row-fluid">
+            <div class = "span1"></div>
+            <div class = "span11"><p class = "question-text">   {{ question.body|safe}} </p></div>
+          </div>
+          <div class="well" style = "margin:10px ">
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <h4 class = "text-center">Teacher Answers</h4>
+            <div>{% if question.num_teacher_answers == 0 %} No teacher answers yet! {% elif question.num_teacher_answers < 3 %} Top {{question.num_teacher_answers}} of {{question.num_teacher_answers}} teacher answers shown: {% else %} Top 2 of {{question.num_teacher_answers}} teacher answers shown... <a class = "hidden-link" href = "{% url 'forum:detail' question.id %}">see more</a> {% endif%}</div><br/>
+            <ul id = "{% if user.userprofile.isTeacher %}talk-{{question.id}}{% endif %}" class = "no-bullet">
+              <!-- teacher ansers -->
+            {% for answer in question.top_teacher_answers %}
+              <li>
+                <div class = "row-fluid">
+                  {% if user.is_authenticated %}
+                  <div id = "talk-votes-{{answer.id}}" class = "span1 text-center">
+                    <span class="icon-arrow-up {% if answer in user.userprofile.upvotedAnswers.all %} voted {% else %} gray-glyph {% endif %} up-vote" value = "{{answer.id}}" aria-hidden="true"></span><br/><span>{{answer.upvotes}}</span><br/><span class="icon-arrow-down {% if answer in user.userprofile.downvotedAnswers.all %} voted {% else %} gray-glyph {% endif %} down-vote" value = "{{answer.id}}" aria-hidden="true"></span>
+                  </div>
+                  {% endif %}
+                  <div class = "span11" >
+                    <p class = "answer-text">
+                      <a class = "hidden-link" href="{% url 'users:profile' answer.user.id %}"><i style = "color: #FF6600" >{{ answer.user }}</i></a><i class = "answer-small"> Teacher
+                      </i></br>
+                      {{ answer|safe }} 
+                    </p>
+                  </div>
+                </div>
+                <hr/>
+              </li>
+            {% endfor %}
+            </ul>
+            <!-- student answers -->
+            <h4 class = "text-center">Student Answers</h4>
+            <div>{% if question.num_student_answers == 0 %} No student answers yet! {% elif question.num_student_answers < 6 %} Top {{question.num_student_answers}} of {{question.num_student_answers}} student answers shown: {% else %} Top 5 of {{question.num_student_answers}} student answers shown... <a class = "hidden-link" href = "{% url 'forum:detail' question.id %}">see more</a> {% endif%}</div><br/>
+            <ul id = "{% if not user.userprofile.isTeacher %}talk-{{question.id}}{% endif %}" class = "no-bullet">
+            {% for answer in question.top_student_answers %}
+              <li>
+                <div class = "row-fluid">
+                  {% if user.is_authenticated %}
+                  <div id = "talk-votes-{{answer.id}}" class = "span1 text-center">
+                    <span class="icon-arrow-up {% if answer in user.userprofile.upvotedAnswers.all %} voted {% else %} gray-glyph {% endif %} up-vote" value = "{{answer.id}}" aria-hidden="true"></span><br/><span>{{answer.upvotes}}</span><br/><span class="icon-arrow-down {% if answer in user.userprofile.downvotedAnswers.all %} voted {% else %} gray-glyph {% endif %} down-vote" value = "{{answer.id}}" aria-hidden="true"></span>
+                  </div>
+                  {% endif %}
+                  <div class = "span11" >
+                    <p class = "answer-text">
+                      <a class = "hidden-link" href="{% url 'users:profile' answer.user.id %}"><i>{{ answer.user }}</i></a><i class = "answer-small"> Student
+                      </i></br>
+                      {{ answer|safe }} 
+                    </p>
+                  </div>
+                </div>
+                <hr/>
+              </li>
+            {% endfor %}
+            </ul>
+            <!-- answer form  -->
+            <div id = "results-{{question.id}}"></div>
+            <form class = "answer-form" style = "margin-bottom: 0px" action="{% url 'forum:answer'%}" method="post" value = "{{question.id}}">
+            {% csrf_token %}
+              <textarea id = "answer-{{question.id}}" name='answer' rows="5" style = "width: 90%" placeholder="Answer!" name="body"></textarea><input class = "btn btn-primary" type="submit" value="Submit" ></input>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+    {% endfor %}
+  {% else %}
+    <p style = "padding: 10px;">No forums are available.</p>
+  {% endif %}
+</div>
+{% endblock %}

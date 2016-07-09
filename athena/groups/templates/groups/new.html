@@ -1,0 +1,48 @@
+{% extends "forum_base.html" %}
+
+{% block forum %}
+<div class = "text-center thumbnail blue-head link question-button">
+	<h1 style = "margin-top: 15px; margin-bottom: 15px;">Create a New Study Group</h1>
+</div>
+<div class = "thumbnail" style = "background-color: white; padding: 0px; margin-top: 10px; padding-bottom: 10px; padding-top: 10px;">
+	<form style = "margin: 15px; text-align: left;" action="{% url 'groups:add_group' %}" method="POST">
+	{% csrf_token %}
+		<div>
+			<input class="inputField" type='text' value='' name='group_name' placeholder='Name'/><br>
+			<input class="inputField" type='text' value='' name='topic' placeholder='Topic'/><br>
+			{% for group_type in group_choices %}
+			<input type="radio" name="group_type" value={{ group_type }}> {{ group_type }}
+	      	{% endfor %}
+	      	<br /><br />
+			{% if all_users %}
+				{% for user in all_users %}
+				<input type="checkbox" name="members" id="option{{user.id}}" value={{ user.id }}> {{user.username}}</input>
+				{% endfor %}
+			{% else %}
+				<p>no users</p>
+			{% endif %}
+			<br /><br />
+		</div>
+			<input class = "btn btn-primary" type="submit" value="Make Group" />
+	</form>
+</div>
+{% endblock %}
+
+
+
+<div>
+  <div class = "text-center thumbnail blue-head link question-button">
+    <div class = "text-center" style = ""> 
+
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

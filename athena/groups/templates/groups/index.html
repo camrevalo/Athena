@@ -1,0 +1,27 @@
+{% extends "forum_base.html" %}
+
+{% block forum %}
+
+
+<div class = "thumbnail" style = "margin-bottom:10px; background-color: white; padding: 0px;">
+  <h4 style = "margin-top:0;" class = "thumbnail blue-head link text-center"> Your Groups </h4>
+  <div style = "padding: 10px;">
+    {% if user.is_authenticated %}
+   <!-- stuff about populating groups -->
+
+      <ul>
+        {% for group in user.userprofile.groups.all %}
+        <li>
+          <a href="{% url 'groups:detail' group.id %}">{{ group.group_name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      
+    {% else %}
+      <p class = "text-center"> Sign in to see your groups </p>
+    {% endif %}
+  </div>
+</div>
+
+
+{% endblock %}

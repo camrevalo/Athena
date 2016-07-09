@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Athena | {% block title %}Athena{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="{% static 'forum/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'forum/bootstrap/css/bootstrap-responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'forum/style.css' %}" rel="stylesheet">
+    <link href="{% static 'users/users-style.css' %}" rel = "stylesheet" >
+
+  </head>
+
+  <body>
+    <!-- div with changing background -->
+    <div id = "changing_background">
+    </div>
+
+    <!-- transparent div with overlaying forms -->
+    <div id = "overlay" class="site-wrapper">
+
+        <div class="site-wrapper-inner">
+
+            <div class="container">
+
+                <div class="row-fluid" align = "center">
+                    <div class = "span6">
+                       {%block spacing %}
+                       {% endblock %}
+                        <h1 class="cover-heading">Welcome to Athena</h1><br/>
+                        <p class="lead">Athena is a website made specifically to satisfy your ever growing academic needs.  We connect like minded academics across the country to get all the answers you need, faster! <br/> Join now.</p>
+                    </div>
+                    <div class = "span6 opaque">
+                        <div class = "text-left thumbnail opaque" style = "border: 1px solid #cccccc; margin: 10px; padding: 10px; background-color: white; color: black; text-shadow: none;">
+                            {% block content %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src = "{% static 'forum/bootstrap/js/bootstrap.js' %}" ></script>
+    <!-- jscript for changing background -->
+    <script>
+        $(document).ready(function(){
+        var header = $('#changing_background');
+
+        var backgrounds = new Array(
+          'url({{STATIC_URL}}users/pic2.jpg)'
+          , 'url({{STATIC_URL}}users/pic5.jpg)'
+          , 'url({{STATIC_URL}}users/pic6.jpg)'
+          , 'url({{STATIC_URL}}users/pic3.jpg)'
+          , 'url({{STATIC_URL}}users/pic7.jpg)'
+        );
+
+        var current = 0;
+        var count = 0;
+        var waitTime = 6000;
+
+        function changeback(){
+            header.css('background-image', backgrounds[current]).fadeOut(500, function(){
+                current++;
+                current = current % backgrounds.length;
+                header.css('background-image', backgrounds[current]).fadeIn(500);
+            });
+        }
+
+        header.css('background-image', backgrounds[0]);
+        setInterval(function(){ changeback() }, waitTime);
+        });
+    </script>
+  </body>
+</html>

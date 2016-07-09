@@ -1,0 +1,65 @@
+{% extends "forum_base.html" %}
+
+{% block forum%}
+
+<!-- questions asked -->
+
+<div class = "thumbnail" style = "background-color: white; padding: 0px;">
+  <div class = "text-center thumbnail blue-head">
+    <h4>Questions Asked:</h4>
+  </div>
+  {% for question in user.question_set.all %}
+    <div style = "border-bottom: solid #dddddd 1px; margin : 0px; padding-top: 5px;">
+      <div class = "question">
+        <div class = "row-fluid">
+          <div class = "span1">
+            <div class = "square-small">
+              <a class = "hidden-link" href="{% url 'users:profile' question.user.id %}"><img  src = "{{ question.user.userprofile.picture }}"></a>
+            </div>
+            <span class = "text-center tiny-text" style = "{% if question.user.userprofile.isTeacher %}color: #FF6600{% else %}color: #0077bb{% endif %}">{% if question.user.userprofile.isTeacher %}Teacher{% else %}{% endif %}</span>
+          </div>
+          <div class = "span11">
+            <div>
+            <span style = "font-size: 13px;"><a class = "hidden-link" href="{% url 'users:profile' question.user.id %}" style = "{% if question.user.userprofile.isTeacher %} color: #FF6600 {% endif %}"><i><b>{{ question.user }}</b></i></a> in {{ question.subject }}</span> &nbsp;&nbsp;<span class = "tiny-text gray-text">{% if question.answer_set.all|length == 1 %} 1 Answer {% elif question.answer_set.all|length == 0 %} Answers needed! {% else %} {{question.answer_set.all|length}} Answers {% endif %}</span>
+            <br/>
+            <p class = "question-title linked" style = "margin: 5px" ><a class = "question-title linked" href="{% url 'forum:detail' question.id %}">{{ question.question_text }}
+            </a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<br/>
+
+<!-- answered questions -->
+
+<div class = "thumbnail" style = "background-color: white; padding: 0px;">
+  <div class = "text-center thumbnail blue-head">
+    <h4>Questions Answered:</h4>
+  </div>
+  {% for question in answered_questions %}
+      <div style = "border-bottom: solid #dddddd 1px; margin : 0px; padding-top: 5px;">
+        <div class = "question">
+          <div class = "row-fluid">
+            <div class = "span1">
+              <div class = "square-small">
+                <a class = "hidden-link" href="{% url 'users:profile' question.user.id %}"><img  src = "{{ question.user.userprofile.picture }}"></a>
+              </div>
+              
+              <span class = "text-center tiny-text" style = "{% if question.user.userprofile.isTeacher %}color: #FF6600{% else %}color: #0077bb{% endif %}">{% if question.user.userprofile.isTeacher %}Teacher{% else %}{% endif %}</span>
+            </div>
+            <div class = "span11">
+              <div>
+              <span style = "font-size: 13px;"><a class = "hidden-link" href="{% url 'users:profile' question.user.id %}" style = "{% if question.user.userprofile.isTeacher %} color: #FF6600; {% endif %}"><i><b>{{ question.user }}</b></i></a> in {{ question.subject }}</span> &nbsp;&nbsp;<span class = "tiny-text gray-text">{% if question.answer_set.all|length == 1 %} 1 Answer {% elif question.answer_set.all|length == 0 %} Answers needed! {% else %} {{question.answer_set.all|length}} Answers {% endif %}</span><br/>
+              <a class = "question-title linked" style = "margin: 5px" href="{% url 'forum:detail' question.id %}">{{ question.question_text }}
+              </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  {% endfor %}
+</div>
+{% endblock%}
